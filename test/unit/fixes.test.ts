@@ -10,7 +10,7 @@ function fixOne(src: string, lang: Lang, index = 0): string {
   expect(fd.fix, "fixable").toBeTruthy();
   return applyEdits(src, [fd.fix!]);
 }
-const fixAll = (src: string, lang: Lang) => applyEdits(src, fixAllEdits(scan(src, lang)));
+const fixAll = (src: string, lang: Lang) => applyEdits(src, fixAllEdits(src, scan(src, lang)));
 
 function parsesAsTs(src: string, tsx = false): string[] {
   const out = ts.transpileModule(src, {

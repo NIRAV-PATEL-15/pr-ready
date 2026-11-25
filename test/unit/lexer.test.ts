@@ -48,8 +48,8 @@ describe("lexer: java", () => {
 
 describe("lexer: rust", () => {
   it("lexes raw strings with hashes", () => {
-    const src = 'let s = r#"println!("hi") "# still"#; x';
-    expect(kinds(src, "rust")).toEqual(["ident:let", "ident:s", "punct:=", 'string:r#"println!("hi") "# still"#', "punct:;", "ident:x"]);
+    const src = 'let s = r##"println!("hi") "# still"##; x';
+    expect(kinds(src, "rust")).toEqual(["ident:let", "ident:s", "punct:=", 'string:r##"println!("hi") "# still"##', "punct:;", "ident:x"]);
   });
   it("lexes byte and C strings", () => {
     expect(kinds('b"a" br"b" c"c" cr#"d"#', "rust").every((k) => k.startsWith("string:"))).toBe(true);
