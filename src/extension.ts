@@ -14,7 +14,10 @@ const MAX_FILE_BYTES = 2 * 1024 * 1024;
 const FIX_ALL_KIND = vscode.CodeActionKind.SourceFixAll.append("prReady");
 
 /** Language of a document we should scan, or undefined if it is not one of ours or is excluded. */
+const SCANNED_SCHEMES = new Set(["file", "untitled", "vscode-remote"]);
+
 function docLang(doc: vscode.TextDocument): Lang | undefined {
+  if (!SCANNED_SCHEMES.has(doc.uri.scheme)) return undefined;
   const lang = langForLanguageId(doc.languageId) ?? (doc.uri.scheme === "untitled" ? undefined : langForPath(doc.uri.path));
   if (!lang) return undefined;
   if (doc.uri.scheme !== "untitled" && /\.d\.[mc]?ts$/i.test(doc.uri.path)) return undefined;
