@@ -91,7 +91,8 @@ describe("getChangedFiles", () => {
     execFileSync("git", ["clone", "-q", dir, clone]);
     try {
       execFileSync("git", ["checkout", "-qb", "work"], { cwd: clone });
-      execFileSync("git", ["branch", "-D", "master"], { cwd: clone, stdio: "ignore" });
+      // the clone checked out "f" (the origin HEAD); with no local main/master, origin/HEAD is used
+      execFileSync("git", ["branch", "-D", "f"], { cwd: clone, stdio: "ignore" });
       fs.writeFileSync(path.join(clone, "c.ts"), "1");
       r = await getChangedFiles(clone);
       expect(r.kind === "ok" && r.base).toBe("origin/HEAD");
