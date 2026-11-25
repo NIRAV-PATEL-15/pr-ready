@@ -47,7 +47,360 @@
     "debug statements",
     "cleanup"
   ],
-  "contributes": {},
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "prReady",
+          "title": "PR Ready Check",
+          "icon": "media/activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "prReady": [
+        {
+          "id": "prReady.results",
+          "name": "Debug Statements",
+          "icon": "media/activity.svg",
+          "contextualTitle": "PR Ready Check"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "prReady.results",
+        "contents": "Find leftover debug statements before you open a pull request.\n[Check Changes](command:prReady.checkChanges)\nScans files changed on this branch (committed, staged and unstaged).\n[Check Workspace](command:prReady.checkWorkspace)"
+      }
+    ],
+    "commands": [
+      {
+        "command": "prReady.checkChanges",
+        "title": "Check Changes",
+        "category": "PR Ready",
+        "icon": "$(git-compare)"
+      },
+      {
+        "command": "prReady.checkWorkspace",
+        "title": "Check Workspace",
+        "category": "PR Ready",
+        "icon": "$(search)"
+      },
+      {
+        "command": "prReady.fixAll",
+        "title": "Fix All",
+        "category": "PR Ready",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "prReady.clearResults",
+        "title": "Clear Results",
+        "category": "PR Ready",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "prReady.fixFinding",
+        "title": "Remove Debug Statement",
+        "category": "PR Ready",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "prReady.ignoreFinding",
+        "title": "Ignore This Line",
+        "category": "PR Ready",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "prReady.fixFile",
+        "title": "Remove All Debug Statements in File",
+        "category": "PR Ready",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "prReady.ignoreFile",
+        "title": "Ignore Debug Statements in This File",
+        "category": "PR Ready",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "prReady.openFinding",
+        "title": "Open Debug Statement",
+        "category": "PR Ready"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "prReady.checkChanges",
+          "when": "view == prReady.results",
+          "group": "navigation@1"
+        },
+        {
+          "command": "prReady.checkWorkspace",
+          "when": "view == prReady.results",
+          "group": "navigation@2"
+        },
+        {
+          "command": "prReady.fixAll",
+          "when": "view == prReady.results",
+          "group": "navigation@3"
+        },
+        {
+          "command": "prReady.clearResults",
+          "when": "view == prReady.results",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "prReady.fixFinding",
+          "when": "view == prReady.results && viewItem == prReadyFinding.fixable",
+          "group": "inline@1"
+        },
+        {
+          "command": "prReady.ignoreFinding",
+          "when": "view == prReady.results && viewItem =~ /^prReadyFinding/",
+          "group": "inline@2"
+        },
+        {
+          "command": "prReady.fixFile",
+          "when": "view == prReady.results && viewItem == prReadyFile.fixable",
+          "group": "inline@1"
+        },
+        {
+          "command": "prReady.ignoreFile",
+          "when": "view == prReady.results && viewItem =~ /^prReadyFile/",
+          "group": "inline@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "prReady.fixFinding",
+          "when": "false"
+        },
+        {
+          "command": "prReady.ignoreFinding",
+          "when": "false"
+        },
+        {
+          "command": "prReady.openFinding",
+          "when": "false"
+        },
+        {
+          "command": "prReady.fixFile",
+          "when": "editorLangId =~ /^(javascript|javascriptreact|typescript|typescriptreact|java|rust)$/"
+        },
+        {
+          "command": "prReady.ignoreFile",
+          "when": "editorLangId =~ /^(javascript|javascriptreact|typescript|typescriptreact|java|rust)$/"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "PR Ready Check",
+      "properties": {
+        "prReady.enableDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show debug statements as warnings (Problems panel and squiggles) in open JavaScript, TypeScript, Java and Rust files.",
+          "scope": "resource"
+        },
+        "prReady.rules": {
+          "type": "object",
+          "description": "Turn individual debug-statement rules on or off.",
+          "properties": {
+            "console.log": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.log(...) calls"
+            },
+            "console.debug": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.debug(...) calls"
+            },
+            "console.info": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.info(...) calls"
+            },
+            "console.warn": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.warn(...) calls"
+            },
+            "console.error": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.error(...) calls"
+            },
+            "console.trace": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.trace(...) calls"
+            },
+            "console.dir": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.dir(...) calls"
+            },
+            "console.table": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.table(...) calls"
+            },
+            "console.time": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.time(...) calls"
+            },
+            "console.timeEnd": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.timeEnd(...) calls"
+            },
+            "console.group": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.group(...) calls"
+            },
+            "console.groupEnd": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.groupEnd(...) calls"
+            },
+            "console.count": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.count(...) calls"
+            },
+            "console.assert": {
+              "type": "boolean",
+              "default": true,
+              "description": "console.assert(...) calls"
+            },
+            "debugger": {
+              "type": "boolean",
+              "default": true,
+              "description": "debugger statements"
+            },
+            "System.out.print": {
+              "type": "boolean",
+              "default": true,
+              "description": "System.out.print(...) calls"
+            },
+            "System.out.println": {
+              "type": "boolean",
+              "default": true,
+              "description": "System.out.println(...) calls"
+            },
+            "System.out.printf": {
+              "type": "boolean",
+              "default": true,
+              "description": "System.out.printf(...) calls"
+            },
+            "System.err.print": {
+              "type": "boolean",
+              "default": true,
+              "description": "System.err.print(...) calls"
+            },
+            "System.err.println": {
+              "type": "boolean",
+              "default": true,
+              "description": "System.err.println(...) calls"
+            },
+            "System.err.printf": {
+              "type": "boolean",
+              "default": true,
+              "description": "System.err.printf(...) calls"
+            },
+            "printStackTrace": {
+              "type": "boolean",
+              "default": true,
+              "description": "<expr>.printStackTrace() calls"
+            },
+            "println!": {
+              "type": "boolean",
+              "default": true,
+              "description": "println!(...) macro invocations"
+            },
+            "print!": {
+              "type": "boolean",
+              "default": true,
+              "description": "print!(...) macro invocations"
+            },
+            "eprintln!": {
+              "type": "boolean",
+              "default": true,
+              "description": "eprintln!(...) macro invocations"
+            },
+            "eprint!": {
+              "type": "boolean",
+              "default": true,
+              "description": "eprint!(...) macro invocations"
+            },
+            "dbg!": {
+              "type": "boolean",
+              "default": true,
+              "description": "dbg!(...) macro invocations"
+            }
+          },
+          "additionalProperties": false,
+          "default": {
+            "console.log": true,
+            "console.debug": true,
+            "console.info": true,
+            "console.warn": true,
+            "console.error": true,
+            "console.trace": true,
+            "console.dir": true,
+            "console.table": true,
+            "console.time": true,
+            "console.timeEnd": true,
+            "console.group": true,
+            "console.groupEnd": true,
+            "console.count": true,
+            "console.assert": true,
+            "debugger": true,
+            "System.out.print": true,
+            "System.out.println": true,
+            "System.out.printf": true,
+            "System.err.print": true,
+            "System.err.println": true,
+            "System.err.printf": true,
+            "printStackTrace": true,
+            "println!": true,
+            "print!": true,
+            "eprintln!": true,
+            "eprint!": true,
+            "dbg!": true
+          },
+          "scope": "resource"
+        },
+        "prReady.ignorePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Glob patterns (relative to the workspace folder) for files that are never checked, e.g. `scripts/**` or `**/*.test.ts`. A pattern without `/` matches a file name at any depth.",
+          "scope": "resource"
+        },
+        "prReady.useDefaultExcludes": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Also skip `node_modules`, `dist`, `build`, `out`, `target` and `.git` folders at any depth.",
+          "scope": "resource"
+        },
+        "prReady.baseBranch": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Branch that **Check Changes** compares against. Empty = detect automatically (`main`, `master`, then `origin/HEAD`).",
+          "scope": "resource"
+        }
+      }
+    }
+  },
   "preview": true,
   "pricing": "Free",
   "repository": {
