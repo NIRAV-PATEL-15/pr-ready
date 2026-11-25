@@ -77,7 +77,7 @@ export function activate(context: vscode.ExtensionContext): PrReadyApi {
 
   const updateStatus = () => {
     const n = results.count;
-    if (!results.scope) { status.hide(); return; }
+    if (!results.scope) { status.hide(); view.badge = undefined; return; }
     const manual = results.all.reduce((a, f) => a + f.findings.filter((x) => x.manual).length, 0);
     status.text = n ? `$(debug-console) ${n}` : "$(check) PR ready";
     status.tooltip = n
