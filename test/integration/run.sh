@@ -54,5 +54,5 @@ code --user-data-dir "$TMP/ud" --extensions-dir "$TMP/ext" --disable-extensions 
 
 # The extension host's console goes to the renderer log, and `code --wait` does not return the test result.
 LOG="$(ls -t "$TMP"/ud/logs/*/window1/renderer.log | head -1)"
-grep -E "\[it\]|AssertionError|Error:|^\s+at |^[+-] " "$LOG" | sed -E 's/^[0-9-]+ [0-9:.]+ \[[a-z]+\] //' || true
+grep -E "\[it\]|^[+-] " "$LOG" | sed -E 's/^[0-9-]+ [0-9:.]+ \[[a-z]+\] //' || true
 grep -q "\[it\] ALL PASSED" "$LOG"

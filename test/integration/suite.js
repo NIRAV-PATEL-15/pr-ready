@@ -7,15 +7,26 @@ const fs = require("fs");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function until(fn, what, ms = 10000) {
   const end = Date.now() + ms;
+  let lastErr;
   for (;;) {
-    const v = await fn();
+    let v;
+    try { v = await fn(); } catch (e) { lastErr = e; } // e.g. "Canceled" when the editor re-requests code actions
     if (v) return v;
-    if (Date.now() > end) throw new Error("timed out waiting for " + what);
+    if (Date.now() > end) throw new Error("timed out waiting for " + what + (lastErr ? " (last error: " + lastErr.message + ")" : ""));
     await sleep(100);
   }
 }
 
 exports.run = async function () {
+  try {
+    await runSuite();
+  } catch (e) {
+    console.log("[it] FAILED: " + (e && e.stack ? e.stack.split("\n").slice(0, 3).join(" | ") : e));
+    throw e;
+  }
+};
+
+async function runSuite() {
   const log = (m) => console.log("[it] " + m);
   const ws = vscode.workspace.workspaceFolders[0].uri.fsPath;
   const p = (rel) => path.join(ws, rel);
@@ -63,9 +74,11 @@ exports.run = async function () {
   for (const t of ["Remove debug statement (console.log)", "Ignore this line (console.log)", "Ignore debug statements in this file"]) {
     assert.ok(titles.includes(t), "action " + t + " in " + JSON.stringify(titles));
   }
-  const manualActions = await vscode.commands.executeCommand("vscode.executeCodeActionProvider", doc.uri, diags[1].range, "quickfix");
+  const manualActions = await until(() => vscode.commands.executeCommand("vscode.executeCodeActionProvider", doc.uri, diags[1].range, "quickfix"), "manual actions");
   assert.ok(manualActions.some((a) => a.title === "Ignore this line (console.debug)"), "manual finding can be ignored");
   assert.ok(!manualActions.some((a) => a.title.startsWith("Remove debug statement (console.debug)")), "manual finding has no remove action");
+  const fixAllOnSave = await until(() => vscode.commands.executeCommand("vscode.executeCodeActionProvider", doc.uri, new vscode.Range(0, 0, 0, 0), "source.fixAll.prReady"), "fix-all action");
+  assert.deepStrictEqual(fixAllOnSave.map((a) => a.title), ["Remove all debug statements in file"]);
   await vscode.workspace.applyEdit(actions.find((a) => a.title.startsWith("Remove debug statement")).edit);
   assert.ok(!doc.getText().includes('console.log("run"'), "console.log removed");
   assert.ok(doc.getText().includes("console.debug(x)"), "manual one kept");
@@ -98,4 +111,4 @@ exports.run = async function () {
   assert.deepStrictEqual(api.results(), []);
   log("ignore file works");
   log("ALL PASSED");
-};
+}
