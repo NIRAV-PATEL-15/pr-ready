@@ -401,7 +401,7 @@
       }
     }
   },
-  "preview": true,
+  "preview": false,
   "pricing": "Free",
   "repository": {
     "type": "git",
@@ -417,5 +417,10 @@
       "description": "In untrusted workspaces, PR Ready Check still shows debug-statement diagnostics, but does not run git (Check Changes is disabled), because a repository's git config can run programs."
     },
     "virtualWorkspaces": false
+  },
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#0f3d2e",
+    "theme": "dark"
   }
 }
