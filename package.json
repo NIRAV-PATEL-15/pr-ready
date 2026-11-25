@@ -1,0 +1,68 @@
+{
+  "name": "pr-ready",
+  "displayName": "PR Ready Check",
+  "description": "Find leftover debug statements (console.log, debugger, System.out.println, printStackTrace, println!, dbg!) in JavaScript, TypeScript, Java and Rust before you open a pull request. Fix or ignore each one.",
+  "version": "0.1.0",
+  "publisher": "NiravPatel15",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:java",
+    "onLanguage:rust"
+  ],
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "package": "npm run build && vsce package --no-dependencies",
+    "test:integration": "npm run build && test/integration/run.sh /tmp/pr-ready-it"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.6",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "3.9.2",
+    "esbuild": "0.28.2",
+    "typescript": "5.6.3",
+    "vitest": "4.1.12"
+  },
+  "keywords": [
+    "console.log",
+    "debugger",
+    "println",
+    "dbg",
+    "pull request",
+    "lint",
+    "debug statements",
+    "cleanup"
+  ],
+  "contributes": {},
+  "preview": true,
+  "pricing": "Free",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NIRAV-PATEL-15/pr-ready.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NIRAV-PATEL-15/pr-ready/issues"
+  },
+  "homepage": "https://github.com/NIRAV-PATEL-15/pr-ready#readme",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In untrusted workspaces, PR Ready Check still shows debug-statement diagnostics, but does not run git (Check Changes is disabled), because a repository's git config can run programs."
+    },
+    "virtualWorkspaces": false
+  }
+}
